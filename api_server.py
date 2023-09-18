@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import logging
 import sys
-
+from loguru import logger
 load_dotenv()
 logger.debug(os.getenv('POSTGRES_URI'))
 
