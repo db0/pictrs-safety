@@ -14,7 +14,7 @@ SQLITE_MODE = os.getenv("USE_SQLITE", "0") == "1"
 
 if SQLITE_MODE:
     logger.warning("Using SQLite for database")
-    APP.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///fedi_safety_api.db"
+    APP.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pictrs_safety_api.db"
 else:
     APP.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('POSTGRES_URI')
     APP.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -22,6 +22,7 @@ else:
         "max_overflow": -1,
     }
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+logger.debug(APP.config)
 db = SQLAlchemy(APP)
 db.init_app(APP)
 
