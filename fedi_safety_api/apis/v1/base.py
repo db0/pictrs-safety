@@ -98,9 +98,9 @@ class Scan(Resource):
                 logger.error(f"Image with state {new_request.state} detected!")
                 return {"message": "Should not be here. Returning OK"},200
         except Exception as err:
+            logger.error(f"Exception while processing scan {err}")
             db.session.delete(new_request)
             db.session.commit()
-            logger.error(f"Exception while processing scan {err}")
             return {"message": "Something went wrong internally. Returning OK"}, 200
 
 class Pop(Resource):
