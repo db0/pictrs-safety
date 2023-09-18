@@ -1,5 +1,6 @@
 import os
 import time
+from uuid import uuid4
 from PIL import Image
 from io import BytesIO
 from werkzeug.datastructures import FileStorage
@@ -46,17 +47,23 @@ class Scan(Resource):
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
-            raise e.BadRequest("No file provided")
-        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-        if not file.filename.lower().endswith(tuple(allowed_extensions)):
-            raise e.BadRequest("Invalid file format")
-        self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{file.filename}"
-        try:
+            img_data = BytesIO(request.data)
+            filetext = request.headers["Content-Type"].split('/',1)[1]
+            upload_filename = f"{uuid4()}.{filetext}"
+            if not img_data:
+                raise e.BadRequest("No file provided")            
+        else:
+            upload_filename = file.filename
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if not upload_filename.lower().endswith(tuple(allowed_extensions)):
+                raise e.BadRequest("Invalid file format")
             img_data = BytesIO(file.read())
+        self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{upload_filename}"
+        try:
             img = Image.open(img_data)
             img.save(self.filename)
             new_request = ScanRequest(
-                image = file.filename
+                image = upload_filename
             )
             db.session.add(new_request)
             db.session.commit()
@@ -69,6 +76,7 @@ class Scan(Resource):
                     os.remove(self.filename)
                     db.session.delete(new_request)
                     db.session.commit()
+                    logger.debug("Scanning timeout")
                     return {"message": "Could not scan request in reasonable amount of time. Returning OK"}, 200
                 time.sleep(1)
             logger.debug(new_request.state)
@@ -76,15 +84,18 @@ class Scan(Resource):
             if new_request.state == enums.State.FAULTED:
                 db.session.delete(new_request)
                 db.session.commit()
+                logger.warning("Faulted request. Returning OK")
                 return {"message": "Faulted request. Returning OK"}, 200 
             if new_request.state == enums.State.DONE:
                 if new_request.is_csam == True:
                     db.session.delete(new_request)
                     db.session.commit()
+                    logger.warning("Potential CSAM Image detected")
                     return {"message": "Potential CSAM Image detected"}, 406
                 else: 
                     db.session.delete(new_request)
                     db.session.commit()
+                    logger.debug("Image OK")
                     return {"message": "Image OK"}, 200 
             else:
                 db.session.delete(new_request)
@@ -92,9 +103,9 @@ class Scan(Resource):
                 logger.error(f"Image with state {new_request.state} detected!")
                 return {"message": "Should not be here. Returning OK"},200
         except Exception as err:
+            logger.error(f"Exception while processing scan: {err}")
             db.session.delete(new_request)
             db.session.commit()
-            logger.error(f"Exception while processing scan {err}")
             return {"message": "Something went wrong internally. Returning OK"}, 200
 
 class Pop(Resource):
