@@ -1,1 +1,1 @@
-# Fediverse Safety API
+# Pict-rs Safety API

@@ -25,7 +25,7 @@ def index():
     """
 
     head = f"""<head>
-    <title>Fediverse Safety</title>
+    <title>Pict-rs Safety</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {style}
     </head>
