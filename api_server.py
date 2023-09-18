@@ -4,6 +4,7 @@ import logging
 import sys
 
 load_dotenv()
+logger.debug(os.getenv('POSTGRES_URI'))
 
 from fedi_safety_api.argparser import args
 from fedi_safety_api.flask import APP
