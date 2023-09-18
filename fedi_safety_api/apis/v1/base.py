@@ -47,7 +47,7 @@ class Scan(Resource):
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
-            file = request.data
+            img_data = request.data
             upload_filename = str(uuid4())
             if not file:
                 raise e.BadRequest("No file provided")            
@@ -56,9 +56,9 @@ class Scan(Resource):
             allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
             if not upload_filename.lower().endswith(tuple(allowed_extensions)):
                 raise e.BadRequest("Invalid file format")
+            img_data = BytesIO(file.read())
         self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{upload_filename}"
         try:
-            img_data = BytesIO(file.read())
             img = Image.open(img_data)
             img.save(self.filename)
             new_request = ScanRequest(
