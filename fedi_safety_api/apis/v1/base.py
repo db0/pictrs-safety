@@ -1,5 +1,6 @@
 import os
 import time
+from uuid import uuid4
 from PIL import Image
 from io import BytesIO
 from werkzeug.datastructures import FileStorage
@@ -43,21 +44,25 @@ class Scan(Resource):
         '''
         # I don't get why this is not using the import from earlier...
         from fedi_safety_api import exceptions as e
-        logger.debug(request.data)
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
-            raise e.BadRequest("No file provided")
-        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-        if not file.filename.lower().endswith(tuple(allowed_extensions)):
-            raise e.BadRequest("Invalid file format")
-        self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{file.filename}"
+            file = request.data
+            upload_filename = str(uuid4())
+            if not file:
+                raise e.BadRequest("No file provided")            
+        else:
+            upload_filename = file.filename
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if not upload_filename.lower().endswith(tuple(allowed_extensions)):
+                raise e.BadRequest("Invalid file format")
+        self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{upload_filename}"
         try:
             img_data = BytesIO(file.read())
             img = Image.open(img_data)
             img.save(self.filename)
             new_request = ScanRequest(
-                image = file.filename
+                image = upload_filename
             )
             db.session.add(new_request)
             db.session.commit()
