@@ -47,10 +47,9 @@ class Scan(Resource):
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
-            logger.debug('vvb')
             img_data = request.data
             upload_filename = str(uuid4())
-            if not file:
+            if not img_data:
                 raise e.BadRequest("No file provided")            
         else:
             upload_filename = file.filename
@@ -59,7 +58,6 @@ class Scan(Resource):
                 raise e.BadRequest("Invalid file format")
             img_data = BytesIO(file.read())
         self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{upload_filename}"
-        logger.debug('aa')
         try:
             img = Image.open(img_data)
             img.save(self.filename)
