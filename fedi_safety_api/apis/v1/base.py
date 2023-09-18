@@ -75,6 +75,7 @@ class Scan(Resource):
                     os.remove(self.filename)
                     db.session.delete(new_request)
                     db.session.commit()
+                    logger.debug("Scanning timeout")
                     return {"message": "Could not scan request in reasonable amount of time. Returning OK"}, 200
                 time.sleep(1)
             logger.debug(new_request.state)
@@ -82,15 +83,18 @@ class Scan(Resource):
             if new_request.state == enums.State.FAULTED:
                 db.session.delete(new_request)
                 db.session.commit()
+                logger.warning("Faulted request. Returning OK")
                 return {"message": "Faulted request. Returning OK"}, 200 
             if new_request.state == enums.State.DONE:
                 if new_request.is_csam == True:
                     db.session.delete(new_request)
                     db.session.commit()
+                    logger.warning("Potential CSAM Image detected")
                     return {"message": "Potential CSAM Image detected"}, 406
                 else: 
                     db.session.delete(new_request)
                     db.session.commit()
+                    logger.debug("Image OK")
                     return {"message": "Image OK"}, 200 
             else:
                 db.session.delete(new_request)
