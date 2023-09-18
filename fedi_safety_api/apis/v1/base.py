@@ -47,7 +47,7 @@ class Scan(Resource):
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
-            img_data = request.data
+            img_data = BytesIO(request.data)
             upload_filename = str(uuid4())
             if not img_data:
                 raise e.BadRequest("No file provided")            
@@ -102,7 +102,7 @@ class Scan(Resource):
                 logger.error(f"Image with state {new_request.state} detected!")
                 return {"message": "Should not be here. Returning OK"},200
         except Exception as err:
-            logger.error(f"Exception while processing scan {err}")
+            logger.error(f"Exception while processing scan: {err}")
             db.session.delete(new_request)
             db.session.commit()
             return {"message": "Something went wrong internally. Returning OK"}, 200
