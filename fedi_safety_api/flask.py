@@ -22,7 +22,7 @@ else:
         "max_overflow": -1,
     }
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-logger.debug(APP.config)
+logger.debug(os.getenv('POSTGRES_URI'))
 db = SQLAlchemy(APP)
 db.init_app(APP)
 
