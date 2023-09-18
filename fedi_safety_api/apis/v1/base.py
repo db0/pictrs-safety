@@ -48,10 +48,8 @@ class Scan(Resource):
         file = self.args["file"]
         if not file:
             img_data = BytesIO(request.data)
-            filetype = request.headers
-            logger.debug(filetype)
-            logger.debug(filetype["Content-Type"])
-            upload_filename = str(uuid4())
+            filetext = request.headers["Content-Type"].split('/',1)[1]
+            upload_filename = f"{uuid4()}.{filetext}"
             if not img_data:
                 raise e.BadRequest("No file provided")            
         else:
