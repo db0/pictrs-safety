@@ -43,6 +43,7 @@ class Scan(Resource):
         '''
         # I don't get why this is not using the import from earlier...
         from fedi_safety_api import exceptions as e
+        logger.debug(request.data)
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
