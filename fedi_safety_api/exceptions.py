@@ -44,5 +44,5 @@ class ServiceUnavailable(wze.ServiceUnavailable):
 def handle_bad_requests(error):
     '''Namespace error handler'''
     if error.log:
-        logger.warning(error.log)
+        logger.debug(error.log)
     return({'message': error.specific}, error.code)
