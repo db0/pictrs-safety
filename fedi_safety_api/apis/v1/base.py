@@ -45,13 +45,12 @@ class Scan(Resource):
         '''
         # I don't get why this is not using the import from earlier...
         from fedi_safety_api import exceptions as e
-        logger.debug([pictrs_id,request.remote_addr])
         if pictrs_id == "IPADDR":
             if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]"))\
                     and not self.is_private_ip(request.remote_addr):
-                raise e.Unauthorized("You are not authorized to use this service", "Unauthorized IP")
+                raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized IP: {request.remote_addr}")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
-            raise e.Unauthorized("You are not authorized to use this service", "Unauthorized ID")
+            raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
@@ -59,12 +58,12 @@ class Scan(Resource):
             filetext = request.headers["Content-Type"].split('/',1)[1]
             upload_filename = f"{uuid4()}.{filetext}"
             if not img_data:
-                raise e.BadRequest("No file provided")            
+                raise e.BadRequest("No file provided","Missing file")
         else:
             upload_filename = file.filename
             allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
             if not upload_filename.lower().endswith(tuple(allowed_extensions)):
-                raise e.BadRequest("Invalid file format")
+                raise e.BadRequest("Invalid file format",f"Invalid file format: {upload_filename}")
             img_data = BytesIO(file.read())
         self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{upload_filename}"
         try:
@@ -73,6 +72,7 @@ class Scan(Resource):
             new_request = ScanRequest(
                 image = upload_filename
             )
+            logger.debug(upload_filename)
             db.session.add(new_request)
             db.session.commit()
             retries = 0
@@ -167,6 +167,7 @@ class Pop(Resource):
         self.args = self.post_parser.parse_args()
         if os.getenv("FEDIVERSE_SAFETY_WORKER_AUTH") != self.args.apikey:
             raise e.Forbidden("Access Denied")
+        logger.debug(self.args.image)
         pop: ScanRequest = database.find_scan_request_by_name(self.args.image)
         if not pop:
             raise e.NotFound("No image found waiting for this result.")
