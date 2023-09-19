@@ -46,10 +46,11 @@ class Scan(Resource):
         # I don't get why this is not using the import from earlier...
         from fedi_safety_api import exceptions as e
         if pictrs_id == "IPADDR":
-            if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]")) and request.remote_addr != "127.0.0.1":
-                raise e.Unauthorized("You are not authorized to use this service")
+            if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]"))\
+                    and not self.is_private_ip(request.remote_addr):
+                raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized IP: {request.remote_addr}")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
-            raise e.Unauthorized("You are not authorized to use this service")
+            raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
@@ -57,12 +58,12 @@ class Scan(Resource):
             filetext = request.headers["Content-Type"].split('/',1)[1]
             upload_filename = f"{uuid4()}.{filetext}"
             if not img_data:
-                raise e.BadRequest("No file provided")            
+                raise e.BadRequest("No file provided","Missing file")
         else:
             upload_filename = file.filename
             allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
             if not upload_filename.lower().endswith(tuple(allowed_extensions)):
-                raise e.BadRequest("Invalid file format")
+                raise e.BadRequest("Invalid file format",f"Invalid file format: {upload_filename}")
             img_data = BytesIO(file.read())
         self.filename = f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{upload_filename}"
         try:
@@ -82,10 +83,9 @@ class Scan(Resource):
                     os.remove(self.filename)
                     db.session.delete(new_request)
                     db.session.commit()
-                    logger.debug("Scanning timeout")
+                    logger.warning("Scanning timeout")
                     return {"message": "Could not scan request in reasonable amount of time. Returning OK"}, 200
                 time.sleep(1)
-            logger.debug(new_request.state)
             os.remove(self.filename)
             if new_request.state == enums.State.FAULTED:
                 db.session.delete(new_request)
@@ -113,6 +113,24 @@ class Scan(Resource):
             db.session.delete(new_request)
             db.session.commit()
             return {"message": "Something went wrong internally. Returning OK"}, 200
+    
+    def is_private_ip(self,remote_addr):
+        if remote_addr == "127.0.0.1":
+            return True
+        if remote_addr.startswith("10"):
+            s = remote_addr.split('.')[1]
+            if int(s) in range(0,255):
+                return True
+        if remote_addr.startswith("172"):
+            s = remote_addr.split('.')[1]
+            if int(s) in range(16,31):
+                return True
+        if remote_addr.startswith("192"):
+            s = remote_addr.split('.')[1]
+            if int(s) == 168:
+                return True
+        return False
+
 
 class Pop(Resource):
     get_parser = api.parser()
