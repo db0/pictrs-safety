@@ -45,12 +45,12 @@ class Scan(Resource):
         '''
         # I don't get why this is not using the import from earlier...
         from fedi_safety_api import exceptions as e
-        logger.debug(pictrs_id)
+        logger.debug([pictrs_id,request.remote_addr])
         if pictrs_id == "IPADDR":
             if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]")) and request.remote_addr != "127.0.0.1":
-                raise e.Unauthorized("You are not authorized to use this service")
+                raise e.Unauthorized("You are not authorized to use this service", "Unauthorized IP")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
-            raise e.Unauthorized("You are not authorized to use this service")
+            raise e.Unauthorized("You are not authorized to use this service", "Unauthorized ID")
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
