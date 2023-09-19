@@ -23,7 +23,7 @@ Start it with
 python -i api_server.py
 ```
 
-`-i` is insecure and will listen to all IPs by default.
+`-i` is insecure and will listen to all IPs by default. You can use `-l` to specify a different listen address
 
 ## Serving via https
 
