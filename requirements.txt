@@ -15,4 +15,3 @@ psycopg2-binary
 regex
 bleach
 pillow>=10.0.1
-sqlalchemy-utils

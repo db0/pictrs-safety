@@ -30,7 +30,6 @@ else:
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(APP)
 db.init_app(APP)
-db.execute('pragma journal_mode=WAL;')
 
 if not SQLITE_MODE:
     with APP.app_context():
