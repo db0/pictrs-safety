@@ -36,6 +36,14 @@ db.init_app(APP)
 if not SQLITE_MODE:
     with APP.app_context():
         logger.debug("pool size = {}".format(db.engine.pool.size()))
+elif SQLITE_MODE == 1:
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
+        cursor.close()
+        logger.info("Set pragma to wal")
+
 logger.init_ok("Fedi Safety Database", status="Started")
 
 # Allow local workstation run
@@ -48,9 +56,3 @@ if cache is None:
     cache.init_app(APP)
     logger.init_warn("Flask Cache", status="SimpleCache")
 
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA journal_mode=WAL;")
-    cursor.close()
-    logger.info("Set pragma to wal")
