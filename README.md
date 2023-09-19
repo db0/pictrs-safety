@@ -39,3 +39,7 @@ This will only listen to 127.0.0.1
 # Docker setup
 
 TBD
+
+# fedi-safety
+
+This tool has been also designed to be used along with [fedi-safety](https://github.com/db0/fedi-safety). [Check the relevant instructions](https://github.com/db0/fedi-safety#pictrs-safety) on how to setup this connection.
