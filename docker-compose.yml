@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  pictrs-safety:
+    image: ghcr.io/db0/pictrs-safety:latest
+    hostname: "pictrs-safety"
+    
+    expose:
+      - '14051'
+    
+    user: 991:991
+
+    environment:
+      - USE_SQLITE=0
+      - FEDIVERSE_SAFETY_WORKER_AUTH=${FEDIVERSE_SAFETY_WORKER_AUTH}
+      - FEDIVERSE_SAFETY_IMGDIR=${FEDIVERSE_SAFETY_IMGDIR}
+      - POSTGRES_URI=${POSTGRES_URI}
+      - KNOWN_PICTRS_IPS=${KNOWN_PICTRS_IPS}
+    
+    restart: unless-stopped
