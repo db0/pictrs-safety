@@ -4,6 +4,8 @@ from flask_caching import Cache
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 os.makedirs(os.getenv("FEDIVERSE_SAFETY_IMGDIR"), exist_ok=True)
 cache = None
@@ -46,3 +48,9 @@ if cache is None:
     cache.init_app(APP)
     logger.init_warn("Flask Cache", status="SimpleCache")
 
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL;")
+    cursor.close()
+    logger.info("Set pragma to wal")
