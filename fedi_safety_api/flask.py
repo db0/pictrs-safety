@@ -56,3 +56,9 @@ if cache is None:
     cache.init_app(APP)
     logger.init_warn("Flask Cache", status="SimpleCache")
 
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL;")
+    cursor.close()
+    logger.info("Set pragma to wal")
