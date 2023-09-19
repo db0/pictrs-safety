@@ -1,5 +1,6 @@
 import os
 import time
+import json
 from uuid import uuid4
 from PIL import Image
 from io import BytesIO
@@ -39,11 +40,17 @@ class Scan(Resource):
     post_parser.add_argument('file', location='files', type=FileStorage, required=False)
 
     @api.expect(post_parser)
-    def post(self):
+    def post(self,pictrs_id):
         '''Scan an image
         '''
         # I don't get why this is not using the import from earlier...
         from fedi_safety_api import exceptions as e
+        if pictrs_id == "IPADDR":
+            if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS")) and request.remote_addr != "127.0.0.1":
+                raise e.Unauthorized("You are not authorized to use this service")
+        elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS")):
+            logger.debug([pictrs_id,json.loads(os.getenv("KNOWN_PICTRS_IDS"))])
+            raise e.Unauthorized("You are not authorized to use this service")
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
