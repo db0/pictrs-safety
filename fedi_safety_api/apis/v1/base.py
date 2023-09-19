@@ -72,7 +72,6 @@ class Scan(Resource):
             new_request = ScanRequest(
                 image = upload_filename
             )
-            logger.debug(upload_filename)
             db.session.add(new_request)
             db.session.commit()
             retries = 0
@@ -84,10 +83,9 @@ class Scan(Resource):
                     os.remove(self.filename)
                     db.session.delete(new_request)
                     db.session.commit()
-                    logger.debug("Scanning timeout")
+                    logger.warning("Scanning timeout")
                     return {"message": "Could not scan request in reasonable amount of time. Returning OK"}, 200
                 time.sleep(1)
-            logger.debug(new_request.state)
             os.remove(self.filename)
             if new_request.state == enums.State.FAULTED:
                 db.session.delete(new_request)
@@ -167,7 +165,6 @@ class Pop(Resource):
         self.args = self.post_parser.parse_args()
         if os.getenv("FEDIVERSE_SAFETY_WORKER_AUTH") != self.args.apikey:
             raise e.Forbidden("Access Denied")
-        logger.debug(self.args.image)
         pop: ScanRequest = database.find_scan_request_by_name(self.args.image)
         if not pop:
             raise e.NotFound("No image found waiting for this result.")
