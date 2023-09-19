@@ -29,6 +29,8 @@ if __name__ == "__main__":
     if args.insecure:
         allowed_host = "0.0.0.0"
         logger.init_warn("WSGI Mode", status="Insecure")
-    serve(APP, port=args.port, url_scheme=url_scheme, threads=45, connection_limit=1024, asyncore_use_poll=True)
+    if args.listen:
+        allowed_host = args.listen
+    serve(APP, host=allowed_host, port=args.port, url_scheme=url_scheme, threads=45, connection_limit=1024, asyncore_use_poll=True)
     logger.init("WSGI Server", status="Stopped")
 
