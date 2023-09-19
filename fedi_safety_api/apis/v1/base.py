@@ -47,7 +47,8 @@ class Scan(Resource):
         from fedi_safety_api import exceptions as e
         logger.debug([pictrs_id,request.remote_addr])
         if pictrs_id == "IPADDR":
-            if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]")) and request.remote_addr != "127.0.0.1":
+            if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]"))\
+                    and not self.is_private_ip(request.remote_addr):
                 raise e.Unauthorized("You are not authorized to use this service", "Unauthorized IP")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
             raise e.Unauthorized("You are not authorized to use this service", "Unauthorized ID")
@@ -114,6 +115,24 @@ class Scan(Resource):
             db.session.delete(new_request)
             db.session.commit()
             return {"message": "Something went wrong internally. Returning OK"}, 200
+    
+    def is_private_ip(self,remote_addr):
+        if remote_addr == "127.0.0.1":
+            return True
+        if remote_addr.startswith("10"):
+            s = remote_addr.split('.')[1]
+            if int(s) in range(0,255):
+                return True
+        if remote_addr.startswith("172"):
+            s = remote_addr.split('.')[1]
+            if int(s) in range(16,31):
+                return True
+        if remote_addr.startswith("192"):
+            s = remote_addr.split('.')[1]
+            if int(s) == 168:
+                return True
+        return False
+
 
 class Pop(Resource):
     get_parser = api.parser()
