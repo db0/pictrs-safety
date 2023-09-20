@@ -51,7 +51,8 @@ class Scan(Resource):
                 raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized IP: {request.remote_addr}")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
             raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
-        if database.count_waiting_scan_requests() > int(os.getenv("SCAN_BYPASS_THRESHOLD", 10)):
+        scan_threshold = int(os.getenv("SCAN_BYPASS_THRESHOLD", 10))
+        if scan_threshold > 0 and database.count_waiting_scan_requests() > scan_threshold:
             return {"message": "Image OK"}, 200 
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
