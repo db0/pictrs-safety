@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "✔️ Checkout"
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: "📣 Release on push"
@@ -52,18 +52,9 @@ jobs:
     #   uses: jlumbroso/free-disk-space@main
     #   with:
     #     tool-cache: false
-    - name: Build and push Docker image
+    - name: "Build and Publish Container to Github Container Registry"
       if: ${{ steps.release.outputs.version != '' }}
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        labels: ${{ steps.release.outputs.version }}
-        tags: ${{ steps.release.outputs.version }}
-
-    # - name: "Build and Publish Container to Github Container Registry"
-    #   if: ${{ steps.release.outputs.version != '' }}
-    #   run: |
-    #     docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
-    #     docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
-    #     docker push ghcr.io/db0/pictrs-safety:latest
+      run: |
+        docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
+        docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
+        docker push ghcr.io/db0/pictrs-safety:latest
