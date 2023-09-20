@@ -55,5 +55,5 @@ jobs:
     - name: "Build and Publish Container to Github Container Registry"
       if: ${{ steps.release.outputs.version != '' }}
       run: |
-        docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
-        docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
+        docker build -t ghcr.io/db0/pictrs-safety:main .
+        docker push ghcr.io/db0/pictrs-safety:main
