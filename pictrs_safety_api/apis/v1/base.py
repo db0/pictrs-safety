@@ -7,16 +7,16 @@ from io import BytesIO
 from werkzeug.datastructures import FileStorage
 from flask import request, send_file
 from flask_restx import Namespace, Resource, reqparse
-from fedi_safety_api.flask import cache, db
+from pictrs_safety_api.flask import cache, db
 from loguru import logger
-from fedi_safety_api.classes.request import ScanRequest
-from fedi_safety_api.database import functions as database
-from fedi_safety_api import exceptions as e
-from fedi_safety_api import enums
+from pictrs_safety_api.classes.request import ScanRequest
+from pictrs_safety_api.database import functions as database
+from pictrs_safety_api import exceptions as e
+from pictrs_safety_api import enums
 
 api = Namespace('v1', 'API Version 1' )
 
-from fedi_safety_api.apis.models.v1 import Models
+from pictrs_safety_api.apis.models.v1 import Models
 
 models = Models(api)
 
@@ -44,7 +44,7 @@ class Scan(Resource):
         '''Scan an image
         '''
         # I don't get why this is not using the import from earlier...
-        from fedi_safety_api import exceptions as e
+        from pictrs_safety_api import exceptions as e
         if pictrs_id == "IPADDR":
             if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]"))\
                     and not self.is_private_ip(request.remote_addr):

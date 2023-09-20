@@ -5,8 +5,8 @@ import sys
 
 load_dotenv()
 
-from fedi_safety_api.argparser import args
-from fedi_safety_api.flask import APP
+from pictrs_safety_api.argparser import args
+from pictrs_safety_api.flask import APP
 from loguru import logger
 
 if __name__ == "__main__":
