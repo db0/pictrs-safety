@@ -3,8 +3,8 @@ from datetime import datetime
 from sqlalchemy import Enum, UniqueConstraint
 
 from loguru import logger
-from fedi_safety_api.flask import db
-from fedi_safety_api import enums
+from pictrs_safety_api.flask import db
+from pictrs_safety_api import enums
 
 
 class ScanRequest(db.Model):

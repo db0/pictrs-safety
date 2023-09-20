@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 import dateutil.relativedelta
 from loguru import logger
-from fedi_safety_api.flask import SQLITE_MODE
+from pictrs_safety_api.flask import SQLITE_MODE
 
 random.seed(random.SystemRandom().randint(0, 2**32 - 1))
 

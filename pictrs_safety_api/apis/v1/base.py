@@ -7,16 +7,16 @@ from io import BytesIO
 from werkzeug.datastructures import FileStorage
 from flask import request, send_file
 from flask_restx import Namespace, Resource, reqparse
-from fedi_safety_api.flask import cache, db
+from pictrs_safety_api.flask import cache, db
 from loguru import logger
-from fedi_safety_api.classes.request import ScanRequest
-from fedi_safety_api.database import functions as database
-from fedi_safety_api import exceptions as e
-from fedi_safety_api import enums
+from pictrs_safety_api.classes.request import ScanRequest
+from pictrs_safety_api.database import functions as database
+from pictrs_safety_api import exceptions as e
+from pictrs_safety_api import enums
 
 api = Namespace('v1', 'API Version 1' )
 
-from fedi_safety_api.apis.models.v1 import Models
+from pictrs_safety_api.apis.models.v1 import Models
 
 models = Models(api)
 
@@ -44,14 +44,15 @@ class Scan(Resource):
         '''Scan an image
         '''
         # I don't get why this is not using the import from earlier...
-        from fedi_safety_api import exceptions as e
+        from pictrs_safety_api import exceptions as e
         if pictrs_id == "IPADDR":
             if request.remote_addr not in json.loads(os.getenv("KNOWN_PICTRS_IPS","[]"))\
                     and not self.is_private_ip(request.remote_addr):
                 raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized IP: {request.remote_addr}")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
             raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
-        if database.count_waiting_scan_requests() > int(os.getenv("SCAN_BYPASS_THRESHOLD", 10)):
+        scan_threshold = int(os.getenv("SCAN_BYPASS_THRESHOLD", 10))
+        if scan_threshold > 0 and database.count_waiting_scan_requests() > scan_threshold:
             return {"message": "Image OK"}, 200 
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
@@ -143,6 +144,7 @@ class Pop(Resource):
         '''Pick up an image to safety validate
         '''
         # I don't get why this is not using the import from earlier...
+        logger.debug(request.remote_addr)
         self.args = self.get_parser.parse_args()
         if os.getenv("FEDIVERSE_SAFETY_WORKER_AUTH") != self.args.apikey:
             raise e.Forbidden("Access Denied")

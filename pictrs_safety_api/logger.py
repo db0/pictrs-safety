@@ -1,7 +1,7 @@
 import sys
 from functools import partialmethod
 from loguru import logger
-from fedi_safety_api.argparser import args
+from pictrs_safety_api.argparser import args
 
 STDOUT_LEVELS = ["GENERATION", "PROMPT"]
 INIT_LEVELS = ["INIT", "INIT_OK", "INIT_WARN", "INIT_ERR"]

@@ -1,8 +1,8 @@
 from flask import render_template, redirect, url_for, request
 from markdown import markdown
 from loguru import logger
-from fedi_safety_api.flask import APP
-import fedi_safety_api.exceptions as e
+from pictrs_safety_api.flask import APP
+import pictrs_safety_api.exceptions as e
 
 @logger.catch(reraise=True)
 @APP.route('/')

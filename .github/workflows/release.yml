@@ -1,0 +1,60 @@
+name: pictrs-safety new release
+
+on:
+  push:
+    branches:
+      - main
+      
+permissions:
+  contents: write
+  pull-requests: read
+  
+jobs:
+  build-n-publish:
+    name: pictrs-safety new release
+    runs-on: ubuntu-latest
+    steps:
+    - name: "✔️ Checkout"
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: "📣 Release on push"
+      id: release
+      uses: rymndhng/release-on-push-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        bump_version_scheme: norelease
+        use_github_release_notes: true
+    - name: "✏️ Generate release changelog"
+      if: ${{ steps.release.outputs.version != '' }}
+      uses: heinrichreimer/github-changelog-generator-action@v2.3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: "💾 Commit new version"
+      if: ${{ steps.release.outputs.version != '' }}
+      run: |
+          version=${{ steps.release.outputs.version }}
+          sed -i "s/^PICTRS_SAFETY_VERSION = .*/PICTRS_SAFETY_VERSION = ${version}/g" ./pictrs_safety_api/consts.py
+          git config user.email github-actions@github.com
+          git config user.name github-actions
+          git commit -am 'version incremented'
+          git push
+    - name: Login to GitHub Container Registry
+      if: ${{ steps.release.outputs.version != '' }}
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Free disk space
+    #   if: ${{ steps.release.outputs.version != '' }}
+    #   uses: jlumbroso/free-disk-space@main
+    #   with:
+    #     tool-cache: false
+    - name: "Build and Publish Container to Github Container Registry"
+      if: ${{ steps.release.outputs.version != '' }}
+      run: |
+        docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
+        docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
+        docker push ghcr.io/db0/pictrs-safety:latest
