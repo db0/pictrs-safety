@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.4](https://github.com/db0/pictrs-safety/tree/v1.1.4) (2023-09-20)
+
+[Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.1.3...v1.1.4)
+
+**Merged pull requests:**
+
+- ci :test [\#12](https://github.com/db0/pictrs-safety/pull/12) ([db0](https://github.com/db0))
+
 ## [v1.1.3](https://github.com/db0/pictrs-safety/tree/v1.1.3) (2023-09-20)
 
 [Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.1.2...v1.1.3)
