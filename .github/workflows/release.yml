@@ -58,7 +58,9 @@ jobs:
       with:
         context: .
         push: true
-        labels: ${{ steps.release.outputs.version }}    
+        labels: ${{ steps.release.outputs.version }}
+        tags: ${{ steps.release.outputs.version }}
+
     # - name: "Build and Publish Container to Github Container Registry"
     #   if: ${{ steps.release.outputs.version != '' }}
     #   run: |
