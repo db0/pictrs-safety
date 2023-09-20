@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.1.3](https://github.com/db0/pictrs-safety/tree/v1.1.3) (2023-09-20)
+
+[Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.1.2...v1.1.3)
+
+**Merged pull requests:**
+
+- ci: test [\#11](https://github.com/db0/pictrs-safety/pull/11) ([db0](https://github.com/db0))
+- ci: another docker push test [\#10](https://github.com/db0/pictrs-safety/pull/10) ([db0](https://github.com/db0))
+
 ## [v1.1.2](https://github.com/db0/pictrs-safety/tree/v1.1.2) (2023-09-20)
 
 [Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.1.1...v1.1.2)
