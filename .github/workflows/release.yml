@@ -52,8 +52,16 @@ jobs:
     #   uses: jlumbroso/free-disk-space@main
     #   with:
     #     tool-cache: false
-    - name: "Build and Publish Container to Github Container Registry"
+    - name: Build and push Docker image
       if: ${{ steps.release.outputs.version != '' }}
-      run: |
-        docker build -t ghcr.io/db0/pictrs-safety:main .
-        docker push ghcr.io/db0/pictrs-safety:main
+      uses: docker/build-push-action
+      with:
+        context: .
+        push: true
+        labels: ${{ steps.release.outputs.version }}    
+    # - name: "Build and Publish Container to Github Container Registry"
+    #   if: ${{ steps.release.outputs.version != '' }}
+    #   run: |
+    #     docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
+    #     docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
+    #     docker push ghcr.io/db0/pictrs-safety:latest
