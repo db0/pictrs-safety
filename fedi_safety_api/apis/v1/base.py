@@ -144,6 +144,7 @@ class Pop(Resource):
         '''Pick up an image to safety validate
         '''
         # I don't get why this is not using the import from earlier...
+        logger.debug(request.remote_addr)
         self.args = self.get_parser.parse_args()
         if os.getenv("FEDIVERSE_SAFETY_WORKER_AUTH") != self.args.apikey:
             raise e.Forbidden("Access Denied")
