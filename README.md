@@ -38,7 +38,7 @@ This will only listen to 127.0.0.1
 
 # Docker setup
 
-TBD
+Add the docker-compose.yml contents into your docker compose. As this service is very lightweight, you can add it to the same docker-compose as your pict-rs.
 
 # fedi-safety
 
