@@ -33,3 +33,10 @@ def find_scan_request_by_id(scan_id):
         ScanRequest.id == scan_id,
     )
     return query.first()
+
+
+def count_waiting_scan_requests():
+    query = ScanRequest.query.filter(
+        ScanRequest.state == enums.State.WAITING,
+    )
+    return query.count()
