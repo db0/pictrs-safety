@@ -54,7 +54,7 @@ jobs:
     #     tool-cache: false
     - name: Build and push Docker image
       if: ${{ steps.release.outputs.version != '' }}
-      uses: docker/build-push-action
+      uses: docker/build-push-action@v5
       with:
         context: .
         push: true
