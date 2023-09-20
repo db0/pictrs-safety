@@ -7,15 +7,17 @@ services:
     ports:
       - "14051:14051"    
     expose:
-      - '14051'
+      - "14051"
     
     user: 991:991
 
     # See .env_template for description of each variable
     environment:
       - USE_SQLITE=1
-      - FEDIVERSE_SAFETY_WORKER_AUTH=abcd1312
-      - FEDIVERSE_SAFETY_IMGDIR=/tmp/images
-      - secret_key=abcdefggjhsarfvcxnewqwedq
-
+      - FEDIVERSE_SAFETY_WORKER_AUTH=${FEDIVERSE_SAFETY_WORKER_AUTH}
+      - FEDIVERSE_SAFETY_IMGDIR=${FEDIVERSE_SAFETY_IMGDIR}
+      - POSTGRES_URI=${POSTGRES_URI}
+      - KNOWN_PICTRS_IPS=${KNOWN_PICTRS_IPS}
+      - SQLALCHEMY_DATABASE_URI=sqlite:///fedi_safety_api.db
+    
     restart: unless-stopped
