@@ -57,4 +57,3 @@ jobs:
       run: |
         docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
         docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
-        docker push ghcr.io/db0/pictrs-safety:latest
