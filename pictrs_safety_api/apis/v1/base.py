@@ -29,9 +29,6 @@ handle_too_many_requests = api.errorhandler(e.TooManyRequests)(e.handle_bad_requ
 handle_internal_server_error = api.errorhandler(e.InternalServerError)(e.handle_bad_requests)
 handle_service_unavailable = api.errorhandler(e.ServiceUnavailable)(e.handle_bad_requests)
 
-# Simple global to track when a worker last checked in
-worker_last_checkin = None
-
 # Used to for the flask limiter, to limit requests per url paths
 def get_request_path():
     # logger.info(dir(request))
