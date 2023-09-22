@@ -56,9 +56,11 @@ class Scan(Resource):
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
             raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
         if worker.is_stale():
+            logger.warning(f"Returning OK due to stale worker. Last seen: {worker.last_check_in}")
             return {"message": "Worker Stale"}, 200 
         scan_threshold = int(os.getenv("SCAN_BYPASS_THRESHOLD", 10))
         if scan_threshold > 0 and database.count_waiting_scan_requests() > scan_threshold:
+            logger.warning(f"Returning OK due to full queue. Queue: {database.count_waiting_scan_requests()}")
             return {"message": "Queue Full"}, 200 
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
@@ -159,6 +161,7 @@ class Pop(Resource):
             return {"message": "Nothing to do"},204
         pop.state = enums.State.PROCESSING
         db.session.commit()
+        worker.check_in()
         return send_file(f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{pop.image}", as_attachment=True, download_name=pop.image)
 
     post_parser = api.parser()
