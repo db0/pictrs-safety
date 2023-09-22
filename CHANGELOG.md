@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.2.0](https://github.com/db0/pictrs-safety/tree/v1.2.0) (2023-09-22)
+
+[Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.1.4...v1.2.0)
+
+**Merged pull requests:**
+
+- feat: Added missing/stale worker threshold [\#14](https://github.com/db0/pictrs-safety/pull/14) ([db0](https://github.com/db0))
+- update docker compose file to utilize variables for secrets [\#13](https://github.com/db0/pictrs-safety/pull/13) ([Security-Chief-Odo](https://github.com/Security-Chief-Odo))
+
 ## [v1.1.4](https://github.com/db0/pictrs-safety/tree/v1.1.4) (2023-09-20)
 
 [Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.1.3...v1.1.4)
