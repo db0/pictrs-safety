@@ -156,12 +156,12 @@ class Pop(Resource):
         self.args = self.get_parser.parse_args()
         if os.getenv("FEDIVERSE_SAFETY_WORKER_AUTH") != self.args.apikey:
             raise e.Forbidden("Access Denied")
+        worker.check_in()
         pop: ScanRequest = database.find_waiting_scan_request()
         if not pop:
             return {"message": "Nothing to do"},204
         pop.state = enums.State.PROCESSING
         db.session.commit()
-        worker.check_in()
         return send_file(f"{os.getenv('FEDIVERSE_SAFETY_IMGDIR')}/{pop.image}", as_attachment=True, download_name=pop.image)
 
     post_parser = api.parser()
