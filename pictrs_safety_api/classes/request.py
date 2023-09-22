@@ -1,6 +1,5 @@
-import dateutil.relativedelta
 from datetime import datetime
-from sqlalchemy import Enum, UniqueConstraint
+from sqlalchemy import Enum
 
 from loguru import logger
 from pictrs_safety_api.flask import db

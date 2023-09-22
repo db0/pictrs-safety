@@ -13,6 +13,7 @@ from pictrs_safety_api.classes.request import ScanRequest
 from pictrs_safety_api.database import functions as database
 from pictrs_safety_api import exceptions as e
 from pictrs_safety_api import enums
+from pictrs_safety_api.classes.worker import worker
 
 api = Namespace('v1', 'API Version 1' )
 
@@ -27,6 +28,9 @@ handle_not_found = api.errorhandler(e.NotFound)(e.handle_bad_requests)
 handle_too_many_requests = api.errorhandler(e.TooManyRequests)(e.handle_bad_requests)
 handle_internal_server_error = api.errorhandler(e.InternalServerError)(e.handle_bad_requests)
 handle_service_unavailable = api.errorhandler(e.ServiceUnavailable)(e.handle_bad_requests)
+
+# Simple global to track when a worker last checked in
+worker_last_checkin = None
 
 # Used to for the flask limiter, to limit requests per url paths
 def get_request_path():
@@ -51,9 +55,11 @@ class Scan(Resource):
                 raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized IP: {request.remote_addr}")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
             raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
+        if worker.is_stale():
+            return {"message": "Worker Stale"}, 200 
         scan_threshold = int(os.getenv("SCAN_BYPASS_THRESHOLD", 10))
         if scan_threshold > 0 and database.count_waiting_scan_requests() > scan_threshold:
-            return {"message": "Image OK"}, 200 
+            return {"message": "Queue Full"}, 200 
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
