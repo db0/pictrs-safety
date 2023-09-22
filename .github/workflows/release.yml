@@ -35,7 +35,7 @@ jobs:
       if: ${{ steps.release.outputs.version != '' }}
       run: |
           version=${{ steps.release.outputs.version }}
-          sed -i "s/^PICTRS_SAFETY_VERSION = .*/PICTRS_SAFETY_VERSION = ${version}/g" ./pictrs_safety_api/consts.py
+          sed -i "s/^PICTRS_SAFETY_VERSION = \".*\"/PICTRS_SAFETY_VERSION = \"${version}\"/g" ./pictrs_safety_api/consts.py
           git config user.email github-actions@github.com
           git config user.name github-actions
           git commit -am 'version incremented'
