@@ -13,6 +13,7 @@ from pictrs_safety_api.classes.request import ScanRequest
 from pictrs_safety_api.database import functions as database
 from pictrs_safety_api import exceptions as e
 from pictrs_safety_api import enums
+from pictrs_safety_api.classes.worker import worker
 
 api = Namespace('v1', 'API Version 1' )
 
@@ -51,9 +52,13 @@ class Scan(Resource):
                 raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized IP: {request.remote_addr}")
         elif pictrs_id not in json.loads(os.getenv("KNOWN_PICTRS_IDS", "[]")):
             raise e.Unauthorized("You are not authorized to use this service", f"Unauthorized ID: {pictrs_id}")
+        if worker.is_stale():
+            logger.warning(f"Returning OK due to stale worker. Last seen: {worker.last_check_in}")
+            return {"message": "Worker Stale"}, 200 
         scan_threshold = int(os.getenv("SCAN_BYPASS_THRESHOLD", 10))
         if scan_threshold > 0 and database.count_waiting_scan_requests() > scan_threshold:
-            return {"message": "Image OK"}, 200 
+            logger.warning(f"Returning OK due to full queue. Queue: {database.count_waiting_scan_requests()}")
+            return {"message": "Queue Full"}, 200 
         self.args = self.post_parser.parse_args()
         file = self.args["file"]
         if not file:
@@ -144,10 +149,11 @@ class Pop(Resource):
         '''Pick up an image to safety validate
         '''
         # I don't get why this is not using the import from earlier...
-        logger.debug(request.remote_addr)
+        # logger.debug(request.remote_addr)
         self.args = self.get_parser.parse_args()
         if os.getenv("FEDIVERSE_SAFETY_WORKER_AUTH") != self.args.apikey:
             raise e.Forbidden("Access Denied")
+        worker.check_in()
         pop: ScanRequest = database.find_waiting_scan_request()
         if not pop:
             return {"message": "Nothing to do"},204
