@@ -1,4 +1,4 @@
-name: pictrs-safety new release
+name: pictrs-safety manual minor release
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ permissions:
   
 jobs:
   build-n-publish:
-    name: pictrs-safety new release
+    name: pictrs-safety manual minor release
     runs-on: ubuntu-latest
     steps:
     - name: "✔️ Checkout"
