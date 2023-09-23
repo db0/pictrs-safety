@@ -1,8 +1,8 @@
 # Changelog
 
-## [v1.3.0](https://github.com/db0/pictrs-safety/tree/v1.3.0) (2023-09-23)
+## [v1.2.1](https://github.com/db0/pictrs-safety/tree/v1.2.1) (2023-09-23)
 
-[Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.2.0...v1.3.0)
+[Full Changelog](https://github.com/db0/pictrs-safety/compare/v1.2.0...v1.2.1)
 
 ## [v1.2.0](https://github.com/db0/pictrs-safety/tree/v1.2.0) (2023-09-22)
 
