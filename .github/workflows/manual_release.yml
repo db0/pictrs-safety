@@ -40,7 +40,7 @@ jobs:
           git push
     - name: Login to GitHub Container Registry
       if: ${{ steps.release.outputs.version != '' }}
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -53,5 +53,7 @@ jobs:
     - name: "Build and Publish Container to Github Container Registry"
       if: ${{ steps.release.outputs.version != '' }}
       run: |
-        docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
+        docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} --label "org.opencontainers.image.source=https://github.com/db0/pictrs-safety" --label "org.opencontainers.image.licenses=AGPL3" .
         docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
+        docker tag ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} ghcr.io/db0/pictrs-safety:latest
+        docker push ghcr.io/db0/pictrs-safety:latest
