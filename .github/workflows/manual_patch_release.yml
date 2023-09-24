@@ -9,6 +9,7 @@ permissions:
   
 jobs:
   build-n-publish:
+    permissions: write-all
     name: pictrs-safety manual patch release
     runs-on: ubuntu-latest
     steps:
