@@ -11,6 +11,7 @@ permissions:
   
 jobs:
   build-n-publish:
+    permissions: write-all
     name: pictrs-safety new release
     runs-on: ubuntu-latest
     steps:
@@ -47,13 +48,10 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    # - name: Free disk space
-    #   if: ${{ steps.release.outputs.version != '' }}
-    #   uses: jlumbroso/free-disk-space@main
-    #   with:
-    #     tool-cache: false
     - name: "Build and Publish Container to Github Container Registry"
       if: ${{ steps.release.outputs.version != '' }}
       run: |
         docker build -t ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} .
         docker push ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }}
+        docker tag ghcr.io/db0/pictrs-safety:${{ steps.release.outputs.version }} ghcr.io/db0/pictrs-safety:latest
+        docker push ghcr.io/db0/pictrs-safety:latest
